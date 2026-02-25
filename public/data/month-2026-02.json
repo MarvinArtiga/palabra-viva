@@ -1,0 +1,78 @@
+{
+  "month": "2026-02",
+  "days": [
+    {
+      "date": "2026-02-22",
+      "liturgicalName": "Tiempo Ordinario",
+      "liturgicalTitle": "VII Domingo del Tiempo Ordinario",
+      "liturgicalColor": "verde",
+      "gospel": {
+        "reference": "Lc 6, 27-38",
+        "title": "Amen a sus enemigos",
+        "excerpt": "Amen a sus enemigos, hagan el bien a los que los odian.",
+        "text": "En aquel tiempo, Jesus dijo a sus discipulos: Amen a sus enemigos, hagan el bien a los que los odian, bendigan a quienes los maldicen y oren por quienes los difaman."
+      },
+      "firstReading": {
+        "reference": "1 Sm 26, 2.7-9.12-13.22-23",
+        "title": "David perdona a Saul",
+        "text": "David no quiso levantar la mano contra el ungido del Senor."
+      },
+      "psalm": {
+        "reference": "Sal 102",
+        "title": "El Senor es compasivo y misericordioso",
+        "text": "Bendice alma mia al Senor y no olvides sus beneficios."
+      },
+      "secondReading": {
+        "reference": "1 Co 15, 45-49",
+        "title": "El hombre celestial",
+        "text": "Asi como hemos llevado la imagen del hombre terreno, llevaremos tambien la del celestial."
+      }
+    },
+    {
+      "date": "2026-02-23",
+      "liturgicalName": "Tiempo Ordinario",
+      "liturgicalTitle": "Catedra de San Pedro",
+      "liturgicalColor": "verde",
+      "gospel": {
+        "reference": "Mt 16, 13-19",
+        "title": "Tu eres Pedro",
+        "excerpt": "Tu eres Pedro y sobre esta piedra edificare mi Iglesia.",
+        "text": "Jesus pregunto a sus discipulos: Y ustedes quien dicen que soy yo? Simon Pedro respondio: Tu eres el Mesias, el Hijo de Dios vivo."
+      },
+      "firstReading": {
+        "reference": "1 Pe 5, 1-4",
+        "title": "Apacienten el rebano de Dios",
+        "text": "A los presbiteros de ustedes les exhorto: apacienten el rebano de Dios."
+      },
+      "psalm": {
+        "reference": "Sal 22",
+        "title": "El Senor es mi pastor",
+        "text": "El Senor es mi pastor, nada me falta."
+      },
+      "secondReading": null
+    },
+    {
+      "date": "2026-02-24",
+      "liturgicalName": "Tiempo Ordinario",
+      "liturgicalTitle": "Martes de la VII semana",
+      "liturgicalColor": "verde",
+      "gospel": {
+        "reference": "Mc 9, 30-37",
+        "title": "El mas grande es el servidor",
+        "excerpt": "Si alguno quiere ser el primero, que sea el ultimo de todos.",
+        "text": "El que quiera ser el primero, que sea el ultimo de todos y el servidor de todos."
+      },
+      "firstReading": {
+        "reference": "St 4, 1-10",
+        "title": "Dios da su gracia a los humildes",
+        "text": "Someteos a Dios; resistid al diablo y huira de ustedes."
+      },
+      "psalm": {
+        "reference": "Sal 54",
+        "title": "El Senor sostiene mi vida",
+        "text": "Dios es mi auxilio, el Senor sostiene mi vida."
+      },
+      "secondReading": null
+    }
+  ]
+}

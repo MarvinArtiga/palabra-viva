@@ -1,0 +1,23 @@
+{
+  "date": "2026-02-23",
+  "liturgicalName": "Tiempo Ordinario",
+  "liturgicalTitle": "Catedra de San Pedro",
+  "liturgicalColor": "verde",
+  "gospel": {
+    "reference": "Mt 16, 13-19",
+    "title": "Tu eres Pedro",
+    "excerpt": "En aquel tiempo, al llegar a la region de Cesarea de Filipo, Jesus pregunto a sus discipulos: Quien dice la gente que es el Hijo del hombre?",
+    "text": "En aquel tiempo, al llegar a la region de Cesarea de Filipo, Jesus pregunto a sus discipulos: Quien dice la gente que es el Hijo del hombre? Ellos contestaron: Unos dicen que Juan el Bautista; otros, que Elias; y otros, que Jeremias o alguno de los profetas. El les pregunto: Y ustedes, quien dicen que soy yo? Simon Pedro tomo la palabra y dijo: Tu eres el Mesias, el Hijo de Dios vivo. Jesus le dijo: Dichoso tu, Simon, hijo de Jonas, porque esto no te lo ha revelado nadie de carne y hueso, sino mi Padre que esta en los cielos. Yo te digo a ti que tu eres Pedro y sobre esta piedra edificare mi Iglesia."
+  },
+  "firstReading": {
+    "reference": "1 Pe 5, 1-4",
+    "title": "Apacienten el rebano de Dios",
+    "text": "Queridos hermanos: A los presbiteros en esa comunidad, yo, presbitero como ellos y testigo de los sufrimientos de Cristo, les exhorto: Apacienten el rebano de Dios que se les ha confiado."
+  },
+  "psalm": {
+    "reference": "Sal 22",
+    "title": "El Senor es mi pastor",
+    "text": "El Senor es mi pastor, nada me falta. En verdes praderas me hace recostar y me conduce hacia fuentes tranquilas."
+  },
+  "secondReading": null
+}

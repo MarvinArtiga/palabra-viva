@@ -1,0 +1,32 @@
+{
+  "month": "2026-01",
+  "days": [
+    {
+      "date": "2026-01-01",
+      "liturgicalName": "Octava de Navidad",
+      "liturgicalTitle": "Santa Maria, Madre de Dios",
+      "liturgicalColor": "blanco",
+      "gospel": {
+        "reference": "Lc 2, 16-21",
+        "title": "Encontraron a Maria, Jose y al nino",
+        "excerpt": "Los pastores fueron y encontraron a Maria y Jose.",
+        "text": "Los pastores fueron y encontraron a Maria, a Jose y al nino acostado en el pesebre."
+      },
+      "firstReading": {
+        "reference": "Nm 6, 22-27",
+        "title": "Invocaran mi nombre",
+        "text": "Asi bendeciran a los hijos de Israel."
+      },
+      "psalm": {
+        "reference": "Sal 66",
+        "title": "Ten piedad de nosotros",
+        "text": "El Senor tenga piedad y nos bendiga."
+      },
+      "secondReading": {
+        "reference": "Ga 4, 4-7",
+        "title": "Dios envio a su Hijo",
+        "text": "Ya no eres esclavo, sino hijo."
+      }
+    }
+  ]
+}
