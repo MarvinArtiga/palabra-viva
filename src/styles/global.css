@@ -271,6 +271,30 @@ a {
   font-weight: 700;
 }
 
+.summary-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.summary-indicator {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #7c879b;
+  border-radius: 999px;
+  background: #eef1f5;
+  transition: transform 0.22s ease, color 0.22s ease, background-color 0.22s ease;
+}
+
+.reading-section[open] .summary-indicator {
+  transform: rotate(180deg);
+  color: #425372;
+  background: #e3e9f2;
+}
+
 .reading-section h3 {
   margin: 0.75rem 0 0.35rem;
 }

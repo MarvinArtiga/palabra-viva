@@ -1,4 +1,4 @@
-import { Volume2 } from 'lucide-react';
+import { ChevronDown, Volume2 } from 'lucide-react';
 
 function ReadingSection({ id, title, reading, onListen, readingMode }) {
   if (!reading) {
@@ -9,7 +9,12 @@ function ReadingSection({ id, title, reading, onListen, readingMode }) {
     <details className="reading-section" open={id === 'gospel-full'}>
       <summary>
         <span className="section-title">{title}</span>
-        <span className="section-ref">{reading.reference}</span>
+        <span className="summary-meta">
+          <span className="section-ref">{reading.reference}</span>
+          <span className="summary-indicator" aria-hidden="true">
+            <ChevronDown size={16} strokeWidth={2.2} />
+          </span>
+        </span>
       </summary>
       <h3>{reading.title}</h3>
       <p className={readingMode ? 'reading-text reading-mode' : 'reading-text'}>{reading.text}</p>
