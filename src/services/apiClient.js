@@ -20,4 +20,9 @@ apiClient.interceptors.response.use(
   }
 );
 
+export async function getWeekReadings(dateStr) {
+  const { data } = await apiClient.get(`/readings/week/${dateStr}`);
+  return data;
+}
+
 export default apiClient;

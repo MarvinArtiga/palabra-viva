@@ -1,4 +1,4 @@
-import { Archive, CalendarDays, House } from 'lucide-react';
+import { CalendarDays, Heart, House } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 function BottomNav() {
@@ -12,9 +12,9 @@ function BottomNav() {
         <CalendarDays className="nav-icon" size={18} />
         Calendario
       </NavLink>
-      <NavLink to="/archivo">
-        <Archive className="nav-icon" size={18} />
-        Archivo
+      <NavLink to="/rosario">
+        <Heart className="nav-icon" size={18} />
+        Rosario
       </NavLink>
     </nav>
   );

@@ -4,43 +4,90 @@ import HeroGospel from '../components/HeroGospel';
 import ReadingSection from '../components/ReadingSection';
 import TTSControls from '../components/TTSControls';
 import DesktopAside from '../components/DesktopAside';
-import { getMonthReadings, getReadingsByDate, getTodayReadings } from '../services/readingsService';
-import { formatMonthKey, toISODate } from '../utils/date';
+import { getLocalISODate } from '../services/dateUtils';
+import { getReadingsByDate, getTodayReadings, getWeekReadings } from '../services/readingsService';
 import useTTS from '../utils/useTTS';
 
 function TodayPage() {
   const { readingMode, setHeaderDay } = useOutletContext();
   const [searchParams] = useSearchParams();
-  const [dayData, setDayData] = useState(null);
-  const [monthDays, setMonthDays] = useState([]);
+  const [selectedDate, setSelectedDate] = useState('');
+  const [reading, setReading] = useState(null);
+  const [week, setWeek] = useState({ start: '', days: [] });
+  const [initialized, setInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const tts = useTTS();
-
-  const selectedDate = searchParams.get('date');
+  const todayDate = useMemo(() => getLocalISODate(), []);
 
   useEffect(() => {
-    const currentDate = selectedDate || toISODate(new Date());
     let cancelled = false;
 
-    async function load() {
+    async function initialize() {
       setLoading(true);
       setError('');
 
       try {
-        const day = selectedDate ? await getReadingsByDate(currentDate) : await getTodayReadings();
-        const month = await getMonthReadings(formatMonthKey(currentDate));
+        const queryDate = searchParams.get('date');
 
+        if (queryDate) {
+          if (cancelled) return;
+          setSelectedDate(queryDate);
+          return;
+        }
+
+        const latest = await getTodayReadings();
         if (cancelled) return;
 
-        setDayData(day);
-        setMonthDays(month.days || []);
-        setHeaderDay(day);
+        setReading(latest);
+        setHeaderDay(latest);
+        setSelectedDate(latest?.date || todayDate);
       } catch {
         if (cancelled) return;
-        setDayData(null);
-        setMonthDays([]);
-        setError('No se pudo cargar. Revisa conexion/servidor.');
+        setSelectedDate(todayDate);
+      } finally {
+        if (!cancelled) {
+          setInitialized(true);
+        }
+      }
+    }
+
+    initialize();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, setHeaderDay, todayDate]);
+
+  useEffect(() => {
+    if (!initialized || !selectedDate) return;
+
+    let cancelled = false;
+
+    async function loadBySelectedDate() {
+      setLoading(true);
+      setError('');
+
+      try {
+        const [selectedReading, selectedWeek] = await Promise.all([
+          getReadingsByDate(selectedDate),
+          getWeekReadings(selectedDate)
+        ]);
+
+        if (cancelled) return;
+
+        setReading(selectedReading);
+        if (selectedReading?.date && selectedReading.date !== selectedDate) {
+          setSelectedDate(selectedReading.date);
+        }
+        setWeek({
+          start: selectedWeek?.start || '',
+          days: Array.isArray(selectedWeek?.days) ? selectedWeek.days : []
+        });
+        setHeaderDay(selectedReading);
+      } catch {
+        if (cancelled) return;
+        setError('Aún no disponible.');
       } finally {
         if (!cancelled) {
           setLoading(false);
@@ -48,24 +95,24 @@ function TodayPage() {
       }
     }
 
-    load();
+    loadBySelectedDate();
 
     return () => {
       cancelled = true;
     };
-  }, [selectedDate, setHeaderDay]);
+  }, [initialized, selectedDate, setHeaderDay]);
 
   const playlist = useMemo(() => {
-    if (!dayData) return [];
+    if (!reading) return [];
     return [
-      { label: 'Primera lectura', text: dayData.firstReading?.text },
-      { label: 'Salmo', text: dayData.psalm?.text },
-      { label: 'Segunda lectura', text: dayData.secondReading?.text },
-      { label: 'Evangelio', text: dayData.gospel?.text }
+      { label: 'Primera lectura', text: reading.firstReading?.text },
+      { label: 'Salmo', text: reading.psalm?.text },
+      { label: 'Segunda lectura', text: reading.secondReading?.text },
+      { label: 'Evangelio', text: reading.gospel?.text }
     ].filter((item) => item.text);
-  }, [dayData]);
+  }, [reading]);
 
-  if (loading) {
+  if (loading && !reading) {
     return (
       <section className="card">
         <p className="loading">Cargando lecturas...</p>
@@ -73,7 +120,7 @@ function TodayPage() {
     );
   }
 
-  if (error) {
+  if (error && !reading) {
     return (
       <section className="card">
         <p className="loading" role="alert">
@@ -83,11 +130,11 @@ function TodayPage() {
     );
   }
 
-  if (!dayData) {
+  if (!reading) {
     return (
       <section className="card">
         <p className="loading" role="alert">
-          No se pudo cargar. Revisa conexion/servidor.
+          Aún no disponible.
         </p>
       </section>
     );
@@ -97,7 +144,7 @@ function TodayPage() {
     <div className="today-grid">
       <section>
         <HeroGospel
-          day={dayData}
+          day={reading}
           readingMode={readingMode}
           onListen={tts.playText}
           onPlayAll={() => tts.playPlaylist(playlist)}
@@ -109,35 +156,43 @@ function TodayPage() {
           <ReadingSection
             id="first-reading"
             title="Primera lectura"
-            reading={dayData.firstReading}
+            reading={reading.firstReading}
             onListen={tts.playText}
             readingMode={readingMode}
           />
           <ReadingSection
             id="psalm"
             title="Salmo"
-            reading={dayData.psalm}
+            reading={reading.psalm}
             onListen={tts.playText}
             readingMode={readingMode}
+            isPsalm
           />
           <ReadingSection
             id="second-reading"
             title="Segunda lectura"
-            reading={dayData.secondReading}
+            reading={reading.secondReading}
             onListen={tts.playText}
             readingMode={readingMode}
           />
           <ReadingSection
             id="gospel-full"
             title="Evangelio completo"
-            reading={dayData.gospel}
+            reading={reading.gospel}
             onListen={tts.playText}
             readingMode={readingMode}
           />
         </div>
       </section>
 
-      <DesktopAside days={monthDays} todayIso={dayData.date} onPlayAll={() => tts.playPlaylist(playlist)} day={dayData} />
+      <DesktopAside
+        selectedDate={selectedDate}
+        days={week.days}
+        todayDate={todayDate}
+        onSelectDate={setSelectedDate}
+        onPlayAll={() => tts.playPlaylist(playlist)}
+        day={reading}
+      />
     </div>
   );
 }

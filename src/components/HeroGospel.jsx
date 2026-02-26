@@ -1,7 +1,15 @@
 import { BookOpen, Headphones, Volume2 } from 'lucide-react';
+import { getLiturgicalColorTheme } from '../utils/liturgicalColor';
+
+function sanitizeExcerpt(text = '') {
+  if (typeof text !== 'string') return '';
+  return text.replace(/aceptar todo/gi, '').replace(/\s{2,}/g, ' ').trim();
+}
 
 function HeroGospel({ day, onListen, onPlayAll, readingMode }) {
   const gospel = day?.gospel;
+  const excerpt = sanitizeExcerpt(gospel?.excerpt || '');
+  const liturgicalTheme = getLiturgicalColorTheme(day?.liturgicalColor || '');
 
   if (!day || !gospel) {
     return null;
@@ -10,15 +18,18 @@ function HeroGospel({ day, onListen, onPlayAll, readingMode }) {
   return (
     <section className="hero-card" aria-label="Evangelio del dia">
       <div className="hero-meta">
-        <p>{day.liturgicalTitle}</p>
-        <span className="badge-color">
-          {day.liturgicalColor}
-          {/* TODO: Conectar color liturgico oficial desde JSON fuente. */}
-        </span>
+        <span className="hero-eyebrow">Evangelio del día</span>
+        {liturgicalTheme && (
+          <span
+            className="hero-liturgical-dot"
+            style={{ backgroundColor: liturgicalTheme.accent }}
+            aria-label="Color litúrgico"
+            title="Color litúrgico"
+          />
+        )}
       </div>
       <h1>{gospel.reference}</h1>
-      <h2>{gospel.title}</h2>
-      {gospel.excerpt && <p className={readingMode ? 'excerpt reading-mode' : 'excerpt'}>{gospel.excerpt}</p>}
+      {excerpt && <p className={readingMode ? 'excerpt reading-mode' : 'excerpt'}>{excerpt}</p>}
       <div className="hero-actions">
         <button type="button" className="primary-btn with-icon">
           <BookOpen size={17} />

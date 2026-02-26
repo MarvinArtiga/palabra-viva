@@ -2,5 +2,6 @@ export {
   getArchiveMonths,
   getMonthReadings,
   getReadingsByDate,
-  getTodayReadings
+  getTodayReadings,
+  getWeekReadings
 } from './readingsApi';

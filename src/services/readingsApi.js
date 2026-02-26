@@ -1,4 +1,4 @@
-import apiClient from './apiClient';
+import apiClient, { getWeekReadings as getWeekReadingsRequest } from './apiClient';
 import { formatMonthKey, toISODate } from '../utils/date';
 
 function pick(obj, keys, fallback = null) {
@@ -11,13 +11,18 @@ function pick(obj, keys, fallback = null) {
   return fallback;
 }
 
+function sanitizeText(value) {
+  if (typeof value !== 'string') return value;
+  return value.replace(/aceptar todo/gi, '').replace(/\s{2,}/g, ' ').trim();
+}
+
 function normalizeReadingText(value) {
   if (!value || typeof value !== 'object') return null;
   return {
-    reference: pick(value, ['reference', 'cita', 'ref'], ''),
-    title: pick(value, ['title', 'titulo'], ''),
-    text: pick(value, ['text', 'contenido', 'body'], ''),
-    excerpt: pick(value, ['excerpt', 'resumen'], '')
+    reference: sanitizeText(pick(value, ['reference', 'cita', 'ref', 'gospel_reference', 'evangelio_cita'], '')),
+    title: sanitizeText(pick(value, ['title', 'titulo'], '')),
+    text: sanitizeText(pick(value, ['text', 'contenido', 'body'], '')),
+    excerpt: sanitizeText(pick(value, ['excerpt', 'resumen'], ''))
   };
 }
 
@@ -29,9 +34,11 @@ function normalizeDailyReading(value) {
 
   return {
     date,
-    liturgicalName: pick(value, ['liturgicalName', 'liturgical_name', 'season', 'season_name'], ''),
-    liturgicalTitle: pick(value, ['liturgicalTitle', 'liturgical_title', 'celebration'], ''),
-    liturgicalColor: pick(value, ['liturgicalColor', 'liturgical_color', 'color'], ''),
+    liturgicalName: sanitizeText(
+      pick(value, ['liturgicalName', 'liturgical_name', 'season', 'season_name'], '')
+    ),
+    liturgicalTitle: sanitizeText(pick(value, ['liturgicalTitle', 'liturgical_title', 'celebration'], '')),
+    liturgicalColor: sanitizeText(pick(value, ['liturgicalColor', 'liturgical_color', 'color'], '')),
     gospel: normalizeReadingText(pick(value, ['gospel', 'evangelio'])),
     firstReading: normalizeReadingText(pick(value, ['firstReading', 'first_reading', 'reading1'])),
     psalm: normalizeReadingText(pick(value, ['psalm', 'salmo', 'salm'])),
@@ -56,6 +63,24 @@ function normalizeMonthReadings(value, requestedMonth) {
   };
 }
 
+function normalizeWeekReadings(value, requestedDate = '') {
+  if (Array.isArray(value)) {
+    const days = value.map(normalizeDailyReading).filter(Boolean);
+    return {
+      start: days[0]?.date || requestedDate,
+      days
+    };
+  }
+
+  const rawDays = pick(value, ['days', 'readings', 'items', 'week'], []);
+  const days = Array.isArray(rawDays) ? rawDays.map(normalizeDailyReading).filter(Boolean) : [];
+
+  return {
+    start: pick(value, ['start', 'weekStart', 'week_start'], days[0]?.date || requestedDate),
+    days
+  };
+}
+
 export async function getTodayReadings() {
   const { data } = await apiClient.get('/readings/latest');
   return normalizeDailyReading(data);
@@ -69,6 +94,11 @@ export async function getReadingsByDate(date) {
 export async function getMonthReadings(month) {
   const { data } = await apiClient.get(`/readings/month/${month}`);
   return normalizeMonthReadings(data, month || formatMonthKey(new Date()));
+}
+
+export async function getWeekReadings(date) {
+  const data = await getWeekReadingsRequest(date);
+  return normalizeWeekReadings(data, date);
 }
 
 export async function getArchiveMonths() {
