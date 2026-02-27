@@ -1,8 +1,6 @@
-import { Type } from 'lucide-react';
 import { parseISODateLocal } from '../services/dateUtils';
 import { normalizeColorKey } from '../utils/liturgicalColor';
 import LogoPlaceholder from './LogoPlaceholder';
-import ShareButton from './ShareButton';
 
 function sanitizeText(text = '') {
   if (typeof text !== 'string') return '';
@@ -21,7 +19,7 @@ function formatHeaderDate(dateStr) {
   }).format(date);
 }
 
-function Header({ day, readingMode, onToggleReadingMode }) {
+function Header({ day }) {
   const liturgicalColorKey = normalizeColorKey(day?.liturgicalColor || '');
   const liturgicalName = sanitizeText(day?.liturgicalName || '') || 'Lecturas del día';
 
@@ -43,18 +41,7 @@ function Header({ day, readingMode, onToggleReadingMode }) {
         <strong>{liturgicalName}</strong>
       </div>
 
-      <div className="header-right">
-        <ShareButton reference={day?.gospel?.reference || 'Evangelio'} date={day?.date} />
-        <button
-          type="button"
-          className="icon-btn icon-only"
-          onClick={onToggleReadingMode}
-          aria-label="Activar o desactivar modo lectura"
-          title={`Modo lectura ${readingMode ? 'activado' : 'desactivado'}`}
-        >
-          <Type size={17} />
-        </button>
-      </div>
+      <div className="header-right" />
     </header>
   );
 }

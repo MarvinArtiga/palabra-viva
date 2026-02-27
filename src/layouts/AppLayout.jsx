@@ -4,14 +4,11 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import Footer from '../components/Footer';
 import { getTodayReadings } from '../services/readingsService';
-import { getReadingMode, setReadingMode } from '../utils/storage';
 
 function AppLayout() {
   const [headerDay, setHeaderDay] = useState(null);
-  const [readingMode, setReadingModeState] = useState(false);
 
   useEffect(() => {
-    setReadingModeState(getReadingMode());
     getTodayReadings().then(setHeaderDay).catch(() => {
       setHeaderDay(null);
     });
@@ -19,23 +16,15 @@ function AppLayout() {
 
   const outletContext = useMemo(
     () => ({
-      readingMode,
+      readingMode: false,
       setHeaderDay
     }),
-    [readingMode]
+    []
   );
 
-  function toggleReadingMode() {
-    setReadingModeState((prev) => {
-      const next = !prev;
-      setReadingMode(next);
-      return next;
-    });
-  }
-
   return (
-    <div className={readingMode ? 'app-shell mode-reading' : 'app-shell'}>
-      <Header day={headerDay} readingMode={readingMode} onToggleReadingMode={toggleReadingMode} />
+    <div className="app-shell">
+      <Header day={headerDay} />
       <main className="page-content">
         <Outlet context={outletContext} />
       </main>

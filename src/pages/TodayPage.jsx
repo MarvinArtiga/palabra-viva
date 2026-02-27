@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import HeroGospel from '../components/HeroGospel';
 import ReadingSection from '../components/ReadingSection';
@@ -7,6 +7,7 @@ import DesktopAside from '../components/DesktopAside';
 import { getLocalISODate } from '../services/dateUtils';
 import { getReadingsByDate, getTodayReadings, getWeekReadings } from '../services/readingsService';
 import useTTS from '../utils/useTTS';
+import useTtsAudio from '../utils/useTtsAudio';
 
 function TodayPage() {
   const { readingMode, setHeaderDay } = useOutletContext();
@@ -17,8 +18,21 @@ function TodayPage() {
   const [initialized, setInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const tts = useTTS();
+  const loadedDateRef = useRef('');
+  const fallbackTts = useTTS();
+  const tts = useTtsAudio({ selectedDate, section: 'gospel' });
   const todayDate = useMemo(() => getLocalISODate(), []);
+
+  function normalizeWeekData(selectedWeek) {
+    return {
+      start: selectedWeek?.start || '',
+      days: Array.isArray(selectedWeek?.days) ? selectedWeek.days : []
+    };
+  }
+
+  function isNotFoundError(error) {
+    return error?.response?.status === 404;
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -36,12 +50,29 @@ function TodayPage() {
           return;
         }
 
-        const latest = await getTodayReadings();
+        const today = getLocalISODate();
+        let initialReading;
+
+        try {
+          initialReading = await getReadingsByDate(today);
+        } catch (error) {
+          if (!isNotFoundError(error)) {
+            throw error;
+          }
+          initialReading = await getTodayReadings();
+        }
+
         if (cancelled) return;
 
-        setReading(latest);
-        setHeaderDay(latest);
-        setSelectedDate(latest?.date || todayDate);
+        const initialDate = initialReading?.date || today;
+        const initialWeek = await getWeekReadings(initialDate);
+        if (cancelled) return;
+
+        setReading(initialReading);
+        setHeaderDay(initialReading);
+        setSelectedDate(initialDate);
+        setWeek(normalizeWeekData(initialWeek));
+        loadedDateRef.current = initialDate;
       } catch {
         if (cancelled) return;
         setSelectedDate(todayDate);
@@ -61,6 +92,7 @@ function TodayPage() {
 
   useEffect(() => {
     if (!initialized || !selectedDate) return;
+    if (loadedDateRef.current === selectedDate) return;
 
     let cancelled = false;
 
@@ -80,11 +112,9 @@ function TodayPage() {
         if (selectedReading?.date && selectedReading.date !== selectedDate) {
           setSelectedDate(selectedReading.date);
         }
-        setWeek({
-          start: selectedWeek?.start || '',
-          days: Array.isArray(selectedWeek?.days) ? selectedWeek.days : []
-        });
+        setWeek(normalizeWeekData(selectedWeek));
         setHeaderDay(selectedReading);
+        loadedDateRef.current = selectedReading?.date || selectedDate;
       } catch {
         if (cancelled) return;
         setError('Aún no disponible.');
@@ -102,15 +132,16 @@ function TodayPage() {
     };
   }, [initialized, selectedDate, setHeaderDay]);
 
-  const playlist = useMemo(() => {
-    if (!reading) return [];
-    return [
-      { label: 'Primera lectura', text: reading.firstReading?.text },
-      { label: 'Salmo', text: reading.psalm?.text },
-      { label: 'Segunda lectura', text: reading.secondReading?.text },
-      { label: 'Evangelio', text: reading.gospel?.text }
-    ].filter((item) => item.text);
-  }, [reading]);
+  useEffect(() => {
+    fallbackTts.stop();
+  }, [fallbackTts.stop, selectedDate]);
+
+  async function playGospelTts() {
+    const ok = await tts.play();
+    if (!ok && reading?.gospel?.text) {
+      fallbackTts.playText('Evangelio', reading.gospel.text);
+    }
+  }
 
   if (loading && !reading) {
     return (
@@ -146,25 +177,24 @@ function TodayPage() {
         <HeroGospel
           day={reading}
           readingMode={readingMode}
-          onListen={tts.playText}
-          onPlayAll={() => tts.playPlaylist(playlist)}
+          onListen={playGospelTts}
         />
 
-        <TTSControls tts={tts} onPlayAll={() => tts.playPlaylist(playlist)} />
+        <TTSControls tts={tts} />
 
         <div className="day-sections">
           <ReadingSection
             id="first-reading"
             title="Primera lectura"
             reading={reading.firstReading}
-            onListen={tts.playText}
+            onListen={fallbackTts.playText}
             readingMode={readingMode}
           />
           <ReadingSection
             id="psalm"
             title="Salmo"
             reading={reading.psalm}
-            onListen={tts.playText}
+            onListen={fallbackTts.playText}
             readingMode={readingMode}
             isPsalm
           />
@@ -172,14 +202,14 @@ function TodayPage() {
             id="second-reading"
             title="Segunda lectura"
             reading={reading.secondReading}
-            onListen={tts.playText}
+            onListen={fallbackTts.playText}
             readingMode={readingMode}
           />
           <ReadingSection
             id="gospel-full"
             title="Evangelio completo"
             reading={reading.gospel}
-            onListen={tts.playText}
+            onListen={playGospelTts}
             readingMode={readingMode}
           />
         </div>
@@ -190,7 +220,7 @@ function TodayPage() {
         days={week.days}
         todayDate={todayDate}
         onSelectDate={setSelectedDate}
-        onPlayAll={() => tts.playPlaylist(playlist)}
+        onPlayAll={playGospelTts}
         day={reading}
       />
     </div>

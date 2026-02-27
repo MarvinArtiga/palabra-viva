@@ -24,7 +24,7 @@ function DesktopAside({ selectedDate, days, todayDate, onSelectDate, onPlayAll, 
         <h3 className="aside-title">Acciones</h3>
         <button type="button" className="aside-action-btn" onClick={onPlayAll}>
           <Headphones size={16} aria-hidden="true" />
-          Escuchar todo
+          Escuchar evangelio
         </button>
       </section>
 

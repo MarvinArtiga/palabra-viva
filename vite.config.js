@@ -54,6 +54,20 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 7
               }
             }
+          },
+          {
+            urlPattern: /\/api\/v1\/tts\//,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'tts-audio-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 7
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
+              }
+            }
           }
         ]
       }
