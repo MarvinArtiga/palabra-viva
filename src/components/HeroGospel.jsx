@@ -11,6 +11,19 @@ function sanitizeExcerpt(text = '') {
   return text.replace(/aceptar todo/gi, '').replace(/\s{2,}/g, ' ').trim();
 }
 
+function scrollToId(event, id) {
+  const element = document.getElementById(id);
+  if (!element) return;
+
+  event.preventDefault();
+  const headerOffset = 90;
+  const elementTop = window.scrollY + element.getBoundingClientRect().top;
+  window.scrollTo({
+    top: Math.max(0, elementTop - headerOffset),
+    behavior: 'smooth'
+  });
+}
+
 function HeroGospel({ day, onListen, readingMode }) {
   const gospel = day?.gospel;
   const excerpt = sanitizeExcerpt(gospel?.excerpt || '');
@@ -82,11 +95,15 @@ function HeroGospel({ day, onListen, readingMode }) {
       <h1>{gospel.reference}</h1>
       {excerpt && <p className={readingMode ? 'excerpt reading-mode' : 'excerpt'}>{excerpt}</p>}
       <div className="hero-actions">
-        <button type="button" className="primary-btn with-icon">
+        <a
+          href="#gospel-summary"
+          className="primary-btn with-icon"
+          onClick={(event) => scrollToId(event, 'gospel-summary')}
+        >
           <BookOpen size={17} />
           Leer completo
-        </button>
-        <button type="button" className="outline-btn with-icon" onClick={onListen}>
+        </a>
+        <button type="button" className="outline-btn with-icon" onClick={() => onListen('gospel')}>
           <Volume2 size={17} />
           Escuchar
         </button>

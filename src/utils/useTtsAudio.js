@@ -24,6 +24,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
   const [isPaused, setIsPaused] = useState(false);
   const [rate, setRateState] = useState(1);
   const [error, setError] = useState('');
+  const [activeSection, setActiveSection] = useState(section);
   const isSupported = useMemo(() => typeof window !== 'undefined' && typeof Audio !== 'undefined', []);
 
   useEffect(() => {
@@ -83,7 +84,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
     };
   }, [isSupported]);
 
-  const stop = useCallback(() => {
+  const restart = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
@@ -98,7 +99,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
   }, []);
 
   const playAtRate = useCallback(
-    async (targetRate) => {
+    async (targetRate, targetSection) => {
       if (!isSupported) {
         setError('Tu navegador no soporta reproducción de audio.');
         return false;
@@ -116,7 +117,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
       }
 
       const url = getTtsUrl(selectedDate, {
-        section,
+        section: targetSection,
         rate: targetRate,
         voice,
         format
@@ -175,10 +176,17 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
         return false;
       }
     },
-    [format, isSupported, section, selectedDate, voice]
+    [format, isSupported, selectedDate, voice]
   );
 
-  const play = useCallback(() => playAtRate(rate), [playAtRate, rate]);
+  const play = useCallback(
+    async (nextSection = activeSection) => {
+      const sectionToPlay = nextSection || activeSection || 'gospel';
+      setActiveSection(sectionToPlay);
+      return playAtRate(rate, sectionToPlay);
+    },
+    [activeSection, playAtRate, rate]
+  );
 
   const pause = useCallback(() => {
     const audio = audioRef.current;
@@ -207,28 +215,38 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
       setRateState(clamped);
 
       if (isPlaying) {
-        await playAtRate(clamped);
+        await playAtRate(clamped, activeSection);
       }
     },
-    [isPlaying, playAtRate]
+    [activeSection, isPlaying, playAtRate]
   );
 
   useEffect(() => {
-    stop();
+    restart();
     setError('');
-  }, [selectedDate, section, stop]);
+  }, [selectedDate, restart]);
+
+  const statusText = useMemo(() => {
+    if (error) return error;
+    if (isLoading) return 'Cargando audio...';
+    if (isPlaying) return 'Reproduciendo';
+    if (isPaused) return 'En pausa';
+    return 'Audio detenido';
+  }, [error, isLoading, isPaused, isPlaying]);
 
   return {
     isSupported,
     isLoading,
     isPlaying,
     isPaused,
+    statusText,
     rate,
     error,
+    activeSection,
     play,
     pause,
     resume,
-    stop,
+    restart,
     setRate
   };
 }

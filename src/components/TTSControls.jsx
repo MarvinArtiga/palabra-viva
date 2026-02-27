@@ -4,13 +4,13 @@ function TTSControls({ tts }) {
     isLoading,
     isPlaying,
     isPaused,
+    statusText,
     rate,
     setRate,
     play,
     pause,
     resume,
-    stop,
-    error
+    restart
   } = tts;
 
   if (!isSupported) {
@@ -25,8 +25,8 @@ function TTSControls({ tts }) {
       <button type="button" className="outline-btn" onClick={isPaused ? resume : pause} disabled={!isPlaying && !isPaused}>
         {isPaused ? 'Reanudar' : 'Pausa'}
       </button>
-      <button type="button" className="outline-btn" onClick={stop} disabled={!isPlaying && !isPaused && !isLoading}>
-        Stop
+      <button type="button" className="outline-btn" onClick={restart} disabled={!isPlaying && !isPaused && !isLoading}>
+        Reiniciar
       </button>
       <label className="speed-control" htmlFor="tts-rate">
         Velocidad
@@ -42,7 +42,7 @@ function TTSControls({ tts }) {
         <span>{rate.toFixed(1)}x</span>
       </label>
       <p className="tts-note" aria-live="polite">
-        {error || (isLoading ? 'Cargando audio...' : isPlaying ? 'Reproduciendo' : isPaused ? 'En pausa' : 'Audio detenido')}
+        {statusText}
       </p>
     </div>
   );

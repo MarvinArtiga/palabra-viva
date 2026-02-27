@@ -6,7 +6,6 @@ import TTSControls from '../components/TTSControls';
 import DesktopAside from '../components/DesktopAside';
 import { getLocalISODate } from '../services/dateUtils';
 import { getReadingsByDate, getTodayReadings, getWeekReadings } from '../services/readingsService';
-import useTTS from '../utils/useTTS';
 import useTtsAudio from '../utils/useTtsAudio';
 
 function TodayPage() {
@@ -18,8 +17,8 @@ function TodayPage() {
   const [initialized, setInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [controlsVisible, setControlsVisible] = useState(false);
   const loadedDateRef = useRef('');
-  const fallbackTts = useTTS();
   const tts = useTtsAudio({ selectedDate, section: 'gospel' });
   const todayDate = useMemo(() => getLocalISODate(), []);
 
@@ -132,15 +131,9 @@ function TodayPage() {
     };
   }, [initialized, selectedDate, setHeaderDay]);
 
-  useEffect(() => {
-    fallbackTts.stop();
-  }, [fallbackTts.stop, selectedDate]);
-
-  async function playGospelTts() {
-    const ok = await tts.play();
-    if (!ok && reading?.gospel?.text) {
-      fallbackTts.playText('Evangelio', reading.gospel.text);
-    }
+  async function handlePlaySection(section) {
+    setControlsVisible(true);
+    await tts.play(section);
   }
 
   if (loading && !reading) {
@@ -177,24 +170,26 @@ function TodayPage() {
         <HeroGospel
           day={reading}
           readingMode={readingMode}
-          onListen={playGospelTts}
+          onListen={handlePlaySection}
         />
 
-        <TTSControls tts={tts} />
+        {controlsVisible && <TTSControls tts={tts} />}
 
         <div className="day-sections">
           <ReadingSection
             id="first-reading"
             title="Primera lectura"
             reading={reading.firstReading}
-            onListen={fallbackTts.playText}
+            onListen={handlePlaySection}
+            ttsSection="first"
             readingMode={readingMode}
           />
           <ReadingSection
             id="psalm"
             title="Salmo"
             reading={reading.psalm}
-            onListen={fallbackTts.playText}
+            onListen={handlePlaySection}
+            ttsSection="psalm"
             readingMode={readingMode}
             isPsalm
           />
@@ -202,14 +197,17 @@ function TodayPage() {
             id="second-reading"
             title="Segunda lectura"
             reading={reading.secondReading}
-            onListen={fallbackTts.playText}
+            onListen={handlePlaySection}
+            ttsSection="second"
             readingMode={readingMode}
           />
           <ReadingSection
             id="gospel-full"
+            anchorId="gospel-summary"
             title="Evangelio completo"
             reading={reading.gospel}
-            onListen={playGospelTts}
+            onListen={handlePlaySection}
+            ttsSection="gospel"
             readingMode={readingMode}
           />
         </div>
@@ -220,7 +218,7 @@ function TodayPage() {
         days={week.days}
         todayDate={todayDate}
         onSelectDate={setSelectedDate}
-        onPlayAll={playGospelTts}
+        onPlayAll={() => handlePlaySection('all')}
         day={reading}
       />
     </div>

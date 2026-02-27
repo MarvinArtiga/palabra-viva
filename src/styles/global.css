@@ -96,6 +96,7 @@ a {
 .page-content {
   width: min(1160px, 100% - 1rem);
   margin: calc(var(--mobile-nav-h) + 1rem) auto 1rem;
+  flex: 1;
 }
 
 .today-grid {
@@ -290,6 +291,10 @@ a {
 .reading-section {
   margin-top: 1rem;
   padding: 1rem 1.1rem 1.2rem;
+}
+
+#gospel-summary {
+  scroll-margin-top: 90px;
 }
 
 .reading-section summary {
@@ -668,11 +673,134 @@ a {
 .app-footer {
   width: min(1160px, 100% - 1rem);
   margin: 0 auto 5.5rem;
-  padding: 1rem;
-  text-align: center;
-  color: var(--muted);
+  padding: 0;
+}
+
+.footer-shell {
+  border-top: 1px solid rgba(145, 118, 70, 0.28);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(250, 245, 236, 0.95) 0%, rgba(245, 240, 230, 0.9) 100%);
+  padding: 1.15rem 1rem 1rem;
+}
+
+.footer-grid {
   display: grid;
-  gap: 0.25rem;
+  gap: 1rem;
+}
+
+.footer-col {
+  display: grid;
+  gap: 0.42rem;
+}
+
+.footer-kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7d6741;
+  font-weight: 700;
+}
+
+.footer-copy {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #55627a;
+}
+
+.footer-pill,
+.footer-link,
+.footer-gh-link {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  border-radius: 999px;
+  transition: color 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.footer-mini-logo {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(98, 86, 64, 0.22);
+  flex-shrink: 0;
+}
+
+.footer-mini-logo-marvin {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+.footer-pill {
+  border: 1px solid rgba(184, 146, 84, 0.35);
+  background: rgba(255, 250, 242, 0.9);
+  padding: 0.24rem 0.58rem;
+  font-size: 0.85rem;
+  color: #725521;
+}
+
+.footer-link {
+  font-size: 0.92rem;
+  color: #455777;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.22rem;
+}
+
+.footer-gh-link {
+  border: 1px solid rgba(123, 96, 160, 0.25);
+  background: rgba(255, 255, 255, 0.75);
+  padding: 0.32rem 0.72rem;
+  font-size: 0.9rem;
+  color: #4b3a6a;
+}
+
+.footer-pill:hover,
+.footer-link:hover,
+.footer-gh-link:hover {
+  color: #1f2937;
+  transform: translateY(-1px);
+}
+
+.footer-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.footer-gh-link:hover {
+  border-color: rgba(123, 96, 160, 0.52);
+  box-shadow: 0 6px 16px rgba(75, 58, 106, 0.12);
+}
+
+.footer-pill:focus-visible,
+.footer-link:focus-visible,
+.footer-gh-link:focus-visible {
+  outline: 2px solid rgba(122, 43, 183, 0.45);
+  outline-offset: 2px;
+}
+
+.footer-bottom {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(145, 118, 70, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: #5f6f83;
+}
+
+.footer-bottom-made {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .bottom-nav {
@@ -767,6 +895,11 @@ a {
 
   .app-footer {
     margin-bottom: 1.2rem;
+  }
+
+  .footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.15rem;
   }
 }
 

@@ -2,7 +2,7 @@ import { ChevronDown, Volume2 } from 'lucide-react';
 import PsalmText from './reading/PsalmText';
 import TextBlocks from './reading/TextBlocks';
 
-function ReadingSection({ id, title, reading, onListen, readingMode, isPsalm = false }) {
+function ReadingSection({ id, anchorId, title, reading, onListen, ttsSection, readingMode, isPsalm = false }) {
   if (!reading) {
     return null;
   }
@@ -10,7 +10,7 @@ function ReadingSection({ id, title, reading, onListen, readingMode, isPsalm = f
   const textClassName = readingMode ? 'reading-text reading-mode' : 'reading-text';
 
   return (
-    <details className="reading-section" open={id === 'gospel-full'}>
+    <details id={anchorId} className="reading-section" open={id === 'gospel-full'}>
       <summary>
         <span className="section-title">{title}</span>
         <span className="summary-meta">
@@ -22,7 +22,7 @@ function ReadingSection({ id, title, reading, onListen, readingMode, isPsalm = f
       </summary>
       <h3>{reading.title}</h3>
       {isPsalm ? <PsalmText text={reading.text} className={textClassName} /> : <TextBlocks text={reading.text} className={textClassName} />}
-      <button type="button" className="outline-btn with-icon" onClick={() => onListen(title, reading.text)}>
+      <button type="button" className="outline-btn with-icon" onClick={() => onListen(ttsSection)}>
         <Volume2 size={16} />
         Escuchar
       </button>
