@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { getTtsUrl, mapTtsErrorMessage } from '../services/ttsService';
 
 const MIN_RATE = 0.75;
 const MAX_RATE = 1.25;
+const DEBUG_TTS = import.meta.env.DEV;
 
 function clampRate(value) {
   const numeric = Number(value);
@@ -9,24 +11,14 @@ function clampRate(value) {
   return Math.min(MAX_RATE, Math.max(MIN_RATE, numeric));
 }
 
-function buildTtsUrl({ selectedDate, section, rate, voice, format }) {
-  const baseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-  const params = new URLSearchParams({
-    section,
-    rate: String(rate),
-    format
-  });
-
-  if (voice) {
-    params.set('voice', voice);
-  }
-
-  const path = `/api/v1/tts/date/${encodeURIComponent(selectedDate)}?${params.toString()}`;
-  return baseUrl ? `${baseUrl}${path}` : path;
+function debugTts(message, payload) {
+  if (!DEBUG_TTS) return;
+  console.debug('[tts-debug]', message, payload);
 }
 
 function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'mp3' }) {
   const audioRef = useRef(null);
+  const objectUrlRef = useRef('');
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -78,6 +70,10 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
 
     return () => {
       audio.pause();
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = '';
+      }
       audio.removeEventListener('loadstart', onLoadStart);
       audio.removeEventListener('playing', onPlaying);
       audio.removeEventListener('pause', onPause);
@@ -92,6 +88,10 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
     if (!audio) return;
     audio.pause();
     audio.currentTime = 0;
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = '';
+    }
     setIsLoading(false);
     setIsPlaying(false);
     setIsPaused(false);
@@ -115,8 +115,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
         return false;
       }
 
-      const url = buildTtsUrl({
-        selectedDate,
+      const url = getTtsUrl(selectedDate, {
         section,
         rate: targetRate,
         voice,
@@ -128,15 +127,51 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
         setIsLoading(true);
         audio.pause();
         audio.currentTime = 0;
-        audio.src = url;
+        debugTts('Request URL', { url });
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            Accept: format === 'ogg' ? 'audio/ogg' : 'audio/mpeg'
+          }
+        });
+
+        const contentType = response.headers.get('content-type') || '';
+        debugTts('Response status', { status: response.status, url, contentType });
+        if (!response.ok) {
+          setError(mapTtsErrorMessage(response.status));
+          setIsLoading(false);
+          setIsPlaying(false);
+          setIsPaused(false);
+          return false;
+        }
+
+        if (!contentType.includes('audio/')) {
+          setError('No se pudo reproducir el audio del evangelio');
+          setIsLoading(false);
+          setIsPlaying(false);
+          setIsPaused(false);
+          return false;
+        }
+
+        const blob = await response.blob();
+        if (objectUrlRef.current) {
+          URL.revokeObjectURL(objectUrlRef.current);
+        }
+        const objectUrl = URL.createObjectURL(blob);
+        objectUrlRef.current = objectUrl;
+        audio.src = objectUrl;
         audio.load();
         await audio.play();
         return true;
-      } catch {
+      } catch (playError) {
+        debugTts('Playback error', {
+          url,
+          message: playError?.message || 'unknown'
+        });
         setIsLoading(false);
         setIsPlaying(false);
         setIsPaused(false);
-        setError('No se pudo reproducir el audio del Evangelio.');
+        setError('No se pudo reproducir el audio del evangelio');
         return false;
       }
     },
@@ -161,7 +196,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
       await audio.play();
       return true;
     } catch {
-      setError('No se pudo reanudar el audio.');
+      setError('No se pudo reproducir el audio del evangelio');
       return false;
     }
   }, [isPaused]);

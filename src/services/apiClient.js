@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const apiBaseUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: apiBaseUrl,
   timeout: 10_000
 });
 
@@ -25,4 +27,5 @@ export async function getWeekReadings(dateStr) {
   return data;
 }
 
+export const API_BASE_URL = apiBaseUrl;
 export default apiClient;
