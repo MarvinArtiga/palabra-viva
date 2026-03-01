@@ -1,4 +1,5 @@
 import { useRoutes } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import AppLayout from '../layouts/AppLayout';
 import TodayPage from '../pages/TodayPage';
 import CalendarView from '../pages/CalendarView';
@@ -19,7 +20,13 @@ const routes = [
 ];
 
 function App() {
-  return useRoutes(routes);
+  const routing = useRoutes(routes);
+  return (
+    <>
+      {routing}
+      <Analytics />
+    </>
+  );
 }
 
 export default App;
