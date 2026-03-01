@@ -1,4 +1,4 @@
-import apiClient, { getWeekReadings as getWeekReadingsRequest } from './apiClient';
+import apiClient, { apiUrl, getWeekReadings as getWeekReadingsRequest } from './apiClient';
 import { formatMonthKey, toISODate } from '../utils/date';
 
 function pick(obj, keys, fallback = null) {
@@ -82,17 +82,17 @@ function normalizeWeekReadings(value, requestedDate = '') {
 }
 
 export async function getTodayReadings() {
-  const { data } = await apiClient.get('/api/v1/readings/latest');
+  const { data } = await apiClient.get(apiUrl('/api/v1/readings/latest'));
   return normalizeDailyReading(data);
 }
 
 export async function getReadingsByDate(date) {
-  const { data } = await apiClient.get(`/api/v1/readings/date/${date}`);
+  const { data } = await apiClient.get(apiUrl(`/api/v1/readings/date/${date}`));
   return normalizeDailyReading(data);
 }
 
 export async function getMonthReadings(month) {
-  const { data } = await apiClient.get(`/api/v1/readings/month/${month}`);
+  const { data } = await apiClient.get(apiUrl(`/api/v1/readings/month/${month}`));
   return normalizeMonthReadings(data, month || formatMonthKey(new Date()));
 }
 

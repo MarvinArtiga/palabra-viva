@@ -1,4 +1,4 @@
-import { resolveApiUrl } from './apiClient';
+import { apiUrl } from './apiClient';
 
 export function getTtsUrl(date, options = {}) {
   const {
@@ -19,7 +19,7 @@ export function getTtsUrl(date, options = {}) {
   }
 
   const path = `/api/v1/tts/date/${encodeURIComponent(date)}?${params.toString()}`;
-  return resolveApiUrl(path);
+  return apiUrl(path);
 }
 
 export function mapTtsErrorMessage(status) {
