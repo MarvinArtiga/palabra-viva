@@ -9,11 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "@vercel/analytics": "^1.5.0",
-=======
     "@vercel/analytics": "^1.6.1",
->>>>>>> 738cc7cc2b5736fcc778b7e98b33523be291091f
     "axios": "^1.13.5",
     "lucide-react": "^0.511.0",
     "react": "^18.3.1",
