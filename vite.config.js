@@ -7,56 +7,54 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icons/icon-192.svg', 'icons/icon-512.svg'],
+      includeAssets: ['favicon.ico'],
       manifest: {
-        name: 'Palabra Viva - Lecturas Catolicas',
+        name: 'Palabra Viva',
         short_name: 'Palabra Viva',
-        description: 'Lecturas catolicas diarias y mensuales en espanol.',
-        theme_color: '#f5f1e8',
-        background_color: '#f5f1e8',
+        description: 'Lecturas diarias del Evangelio con audio',
+        theme_color: '#C69C3F',
+        background_color: '#F5F1E8',
         display: 'standalone',
         start_url: '/',
         icons: [
           {
-            src: '/icons/icon-192.svg',
+            src: '/icons/icon-192.png',
             sizes: '192x192',
-            type: 'image/svg+xml'
+            type: 'image/png'
           },
           {
-            src: '/icons/icon-512.svg',
+            src: '/icons/icon-512.png',
             sizes: '512x512',
-            type: 'image/svg+xml'
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512-maskable.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
           }
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,json}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
         runtimeCaching: [
           {
-            urlPattern: /\/data\/month-\d{4}-\d{2}\.json$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'month-readings-cache',
-              expiration: {
-                maxEntries: 12,
-                maxAgeSeconds: 60 * 60 * 24 * 90
-              }
-            }
-          },
-          {
-            urlPattern: /\/data\/latest\.json$/,
+            urlPattern: /\/api\/v1\/readings\/.*/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'latest-reading-cache',
-              networkTimeoutSeconds: 3,
+              cacheName: 'api-readings-cache',
+              networkTimeoutSeconds: 5,
               expiration: {
-                maxEntries: 1,
+                maxEntries: 60,
                 maxAgeSeconds: 60 * 60 * 24 * 7
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           },
           {
-            urlPattern: /\/(?:api\/v1\/)?tts\//,
+            urlPattern: /\/api\/v1\/tts\/.*/,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'tts-audio-cache',
