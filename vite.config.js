@@ -56,7 +56,7 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /\/api\/v1\/tts\//,
+            urlPattern: /\/(?:api\/v1\/)?tts\//,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'tts-audio-cache',

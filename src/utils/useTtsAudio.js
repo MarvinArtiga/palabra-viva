@@ -60,7 +60,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
       setIsLoading(false);
       setIsPlaying(false);
       setIsPaused(false);
-      setError('No se pudo cargar el audio del Evangelio para esta fecha.');
+      setError('No se pudo cargar el audio del evangelio para esta fecha.');
     }
 
     audio.addEventListener('loadstart', onLoadStart);
@@ -172,7 +172,7 @@ function useTtsAudio({ selectedDate, section = 'gospel', voice = '', format = 'm
         setIsLoading(false);
         setIsPlaying(false);
         setIsPaused(false);
-        setError('No se pudo reproducir el audio del evangelio');
+        setError(mapTtsErrorMessage(playError?.status || playError?.response?.status));
         return false;
       }
     },
