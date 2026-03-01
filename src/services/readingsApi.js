@@ -82,17 +82,17 @@ function normalizeWeekReadings(value, requestedDate = '') {
 }
 
 export async function getTodayReadings() {
-  const { data } = await apiClient.get('/readings/latest');
+  const { data } = await apiClient.get('/api/v1/readings/latest');
   return normalizeDailyReading(data);
 }
 
 export async function getReadingsByDate(date) {
-  const { data } = await apiClient.get(`/readings/date/${date}`);
+  const { data } = await apiClient.get(`/api/v1/readings/date/${date}`);
   return normalizeDailyReading(data);
 }
 
 export async function getMonthReadings(month) {
-  const { data } = await apiClient.get(`/readings/month/${month}`);
+  const { data } = await apiClient.get(`/api/v1/readings/month/${month}`);
   return normalizeMonthReadings(data, month || formatMonthKey(new Date()));
 }
 

@@ -4,18 +4,16 @@ function trimTrailingSlash(value = '') {
   return value.replace(/\/+$/, '');
 }
 
-const apiBaseUrl = trimTrailingSlash(
-  import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || ''
-);
+export const API_BASE = trimTrailingSlash(import.meta.env.VITE_API_BASE_URL ?? '');
 
 export function resolveApiUrl(path = '') {
-  if (!path) return apiBaseUrl;
+  if (!path) return API_BASE;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  return apiBaseUrl ? `${apiBaseUrl}${normalizedPath}` : normalizedPath;
+  return API_BASE ? `${API_BASE}${normalizedPath}` : normalizedPath;
 }
 
 const apiClient = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: API_BASE,
   timeout: 10_000
 });
 
@@ -35,9 +33,8 @@ apiClient.interceptors.response.use(
 );
 
 export async function getWeekReadings(dateStr) {
-  const { data } = await apiClient.get(`/readings/week/${dateStr}`);
+  const { data } = await apiClient.get(`/api/v1/readings/week/${dateStr}`);
   return data;
 }
 
-export const API_BASE_URL = apiBaseUrl;
 export default apiClient;

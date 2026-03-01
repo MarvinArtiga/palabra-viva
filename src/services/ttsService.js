@@ -18,7 +18,7 @@ export function getTtsUrl(date, options = {}) {
     params.set('voice', voice);
   }
 
-  const path = `/tts/date/${encodeURIComponent(date)}?${params.toString()}`;
+  const path = `/api/v1/tts/date/${encodeURIComponent(date)}?${params.toString()}`;
   return resolveApiUrl(path);
 }
 
